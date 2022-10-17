@@ -32,11 +32,11 @@ functions, such that the key Transform steps can be covered by tests
 and jobs or called from within another environment (e.g. a Jupyter or
 Zeppelin notebook).
 """
-
+import lit as lit
 from pyspark.sql import Row
 from pyspark.sql.functions import col, concat_ws, lit
-
 from dependencies.spark import start_spark
+
 
 
 def main():
@@ -47,7 +47,7 @@ def main():
     # start Spark application and get Spark session, logger and config
     spark, log, config = start_spark(
         app_name='my_etl_job',
-        files=['configs/etl_config.json'])
+        files=['C:/Users/gotur/PycharmProjects/pyspark-example-project/configs/etl_config.json'])
 
     # log that main ETL job is starting
     log.warn('etl_job is up-and-running')
@@ -56,6 +56,8 @@ def main():
     data = extract_data(spark)
     data_transformed = transform_data(data, config['steps_per_floor'])
     load_data(data_transformed)
+
+    #, config['steps_per_floor']
 
     # log the success and terminate Spark application
     log.warn('test_etl_job is finished')
@@ -72,8 +74,8 @@ def extract_data(spark):
     df = (
         spark
         .read
-        .parquet('tests/test_data/employees'))
-
+        .parquet('C:/Users/gotur/PycharmProjects/pyspark-example-project/tests/test_data/employees'))
+    df.show()
     return df
 
 
@@ -94,7 +96,7 @@ def transform_data(df, steps_per_floor_):
                 col('first_name'),
                 col('second_name')).alias('name'),
                (col('floor') * lit(steps_per_floor_)).alias('steps_to_desk')))
-
+    df_transformed.show()
     return df_transformed
 
 
@@ -137,7 +139,7 @@ def create_test_data(spark, config):
     (df
      .coalesce(1)
      .write
-     .parquet('tests/test_data/employees', mode='overwrite'))
+     .parquet('C:/Users/gotur/PycharmProjects/pyspark-example-project/tests/test_data/employees', mode='overwrite'))
 
     # create transformed version of data
     df_tf = transform_data(df, config['steps_per_floor'])
@@ -146,9 +148,9 @@ def create_test_data(spark, config):
     (df_tf
      .coalesce(1)
      .write
-     .parquet('tests/test_data/employees_report', mode='overwrite'))
+     .parquet('C:/Users/goturPycharmProjects/pyspark-example-project/tests/test_data/employees_report', mode='overwrite'))
 
-    return None
+    #return None
 
 
 # entry point for PySpark ETL application
